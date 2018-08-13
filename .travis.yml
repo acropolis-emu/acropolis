@@ -1,0 +1,27 @@
+language: c++
+
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - lcov
+            - gcovr
+      env:
+        - CXX_COMPILER=g++-7
+        - C_COMPILER=gcc-7
+
+script:
+  - cmake -E make_directory build && cmake -E chdir build cmake -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug ..
+  - cmake --build build -- all
+  - cmake --build build -- coverage
+
+after_success:
+  - cd ${TRAVIS_BUILD_DIR}
+  - lcov --directory build --capture --output-file coverage.info
+  - lcov --remove coverage.info '/usr/*' 'gtest/*' 'gmock/*' 'tests/*' --output-file coverage.info
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
