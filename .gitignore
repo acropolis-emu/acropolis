@@ -37,3 +37,5 @@ cmake-build-*
 
 # IDE
 .idea/*
+.vs
+CMakeSettings.json
