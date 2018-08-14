@@ -15,4 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "NECV60.h"
+#ifndef ACROPOLIS_NECV60_H
+#define ACROPOLIS_NECV60_H
+
+
+class NECV60 {
+
+};
+
+
+#endif //ACROPOLIS_NECV60_H
