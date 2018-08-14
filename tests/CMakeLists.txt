@@ -7,13 +7,7 @@ include(GoogleTest)
 set(TEST_SOURCE_FILES main.cpp)
 add_executable(tests test_runner.cpp ${TEST_SOURCE_FILES})
 
-if (MSVC)
-    set(ACROPOLIS_LIB acropolis_static)
-else()
-    set(ACROPOLIS_LIB acropolis)
-endif()
-
-target_link_libraries(tests ${ACROPOLIS_LIB})
+target_link_libraries(tests acropolis_libretro_testing)
 target_link_libraries(tests GTest::gtest)
 target_link_libraries(tests GMock::main)
 

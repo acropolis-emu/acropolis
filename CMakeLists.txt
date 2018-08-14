@@ -40,7 +40,8 @@ set(SOURCE_FILES
         )
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")
-add_library(acropolis SHARED ${SOURCE_FILES})
+
+add_library(acropolis_libretro SHARED ${SOURCE_FILES})
 
 configure_file(src/config.h.in ${CMAKE_BINARY_DIR}/generated/config.h)
 include_directories(${CMAKE_BINARY_DIR}/generated/)
@@ -54,7 +55,6 @@ endif()
 # custom options for MacOS
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7")
 endif()
 
 # Add a DEBUG flag when compiling in Debug mode
@@ -67,10 +67,9 @@ endif()
 # Enable and run the tests, for MSVC use a static version of the library
 #
 if(NOT SKIP_TESTS)
-    if (MSVC)
-        add_library(acropolis_static STATIC ${SOURCE_FILES})
-    endif()
     enable_testing()
+    # compile static version for testing
+    add_library(acropolis_libretro_testing STATIC ${SOURCE_FILES})
     add_subdirectory(tests)
 endif()
 
