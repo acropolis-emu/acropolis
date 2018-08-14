@@ -42,6 +42,7 @@ set(SOURCE_FILES
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")
 
 add_library(acropolis_libretro SHARED ${SOURCE_FILES})
+set_target_properties(acropolis_libretro PROPERTIES PREFIX "")  # remove lib prefix from target
 
 configure_file(src/config.h.in ${CMAKE_BINARY_DIR}/generated/config.h)
 include_directories(${CMAKE_BINARY_DIR}/generated/)
