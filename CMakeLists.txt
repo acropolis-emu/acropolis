@@ -35,6 +35,7 @@ include(TestBigEndian)
 include(CTest)
 
 set(SOURCE_FILES
+        src/frontend/libretro/libretro.cpp
         src/necv60/necv60.cpp src/necv60/necv60.h
         )
 
