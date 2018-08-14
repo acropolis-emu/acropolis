@@ -35,7 +35,7 @@ include(TestBigEndian)
 include(CTest)
 
 set(SOURCE_FILES
-        src/NECV60.cpp src/NECV60.h
+        src/necv60/necv60.cpp src/necv60/necv60.h
         )
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")
