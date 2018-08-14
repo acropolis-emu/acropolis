@@ -18,10 +18,6 @@
 #ifndef ACROPOLIS_NECV60_H
 #define ACROPOLIS_NECV60_H
 
+class NECV60 {};
 
-class NECV60 {
-
-};
-
-
-#endif //ACROPOLIS_NECV60_H
+#endif // ACROPOLIS_NECV60_H
