@@ -21,5 +21,6 @@
 #include <string>
 
 static const std::string ACROPOLIS_VERSION = "@PROJECT_VERSION@";
+static const std::string ACROPOLIS_NAME = "Acropolis";
 
 #endif // VERSION_CONFIG_H
