@@ -4,7 +4,9 @@ find_package(GTest CONFIG REQUIRED)
 find_package(GMock CONFIG REQUIRED)
 include(GoogleTest)
 
-set(TEST_SOURCE_FILES main.cpp)
+set(TEST_SOURCE_FILES
+        test_r3000a/test_registers.cpp)
+include_directories(. "../src")
 add_executable(tests test_runner.cpp ${TEST_SOURCE_FILES})
 
 target_link_libraries(tests acropolis_libretro_testing)

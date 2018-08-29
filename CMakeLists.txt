@@ -36,12 +36,12 @@ include(CTest)
 
 set(SOURCE_FILES
         src/frontend/libretro/libretro.cpp
-        src/necv60/necv60.cpp src/necv60/necv60.h
+        src/r3000a/cpu.cpp src/r3000a/cpu.h
         )
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")
 
-add_library(acropolis_libretro SHARED ${SOURCE_FILES})
+add_library(acropolis_libretro SHARED ${SOURCE_FILES} src/r3000a/registers.cpp src/r3000a/registers.h)
 set_target_properties(acropolis_libretro PROPERTIES PREFIX "")  # remove lib prefix from target
 
 configure_file(src/config.h.in ${CMAKE_BINARY_DIR}/generated/config.h)

@@ -39,3 +39,6 @@ cmake-build-*
 .idea/*
 .vs
 CMakeSettings.json
+
+# OS files
+.DS_Store
