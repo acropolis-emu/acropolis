@@ -17,22 +17,21 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <necv60/registers.h>
+#include <r3000a/registers.h>
 
-TEST(ComputeFlags, TestPSW) {
+TEST(Registers, TestAlias) {
   Registers registers{};
-  auto &psw = static_cast<uint32_t &>(registers.psw);
 
-  psw = 0x00000001;
+  registers[1] = 0x10;
+  EXPECT_EQ(registers.at, 0x10);
 
-  EXPECT_EQ(0x00000001, static_cast<uint32_t &>(registers.psw));
-  EXPECT_EQ(0x00000001, registers.psw.value);
-  EXPECT_EQ(1, registers.psw.z);
+  registers.at = 0x20;
+  EXPECT_EQ(registers[1], 0x20);
+}
 
-  psw = 0x00010000;
-
-  EXPECT_EQ(0x00010000, static_cast<uint32_t &>(registers.psw));
-  EXPECT_EQ(0x00010000, registers.psw.value);
-  EXPECT_EQ(1, registers.psw.te);
-
+TEST(Registers, TestZeroRegister) {
+  Registers registers{};
+  registers[0] = 0x10;
+  EXPECT_EQ(registers.zr, 0x00);
+  EXPECT_EQ(registers[0], 0x00);
 }
