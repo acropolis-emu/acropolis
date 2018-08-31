@@ -15,23 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <r3000a/registers.h>
+#ifndef ACROPOLIS_PSX_H
+#define ACROPOLIS_PSX_H
 
-TEST(Registers, TestAlias) {
-  Registers registers{};
+#include <cstdint>
+#include "memory.h"
+#include "r3000a/cpu.h"
 
-  registers.gpset(1, 0x10);
-  EXPECT_EQ(registers.at, 0x10);
+class PSX {
+  PSXMemory memory;
+  std::unique_ptr<R3000A> cpu;
 
-  registers.at = 0x20;
-  EXPECT_EQ(registers.gpget(1), 0x20);
-}
+  PSX();
+};
 
-TEST(Registers, TestZeroRegister) {
-  Registers registers{};
-  registers.gpset(0, 0x10);
-  EXPECT_EQ(registers.zr, 0x00);
-  EXPECT_EQ(registers.gpget(0), 0x00);
-}
+#endif //ACROPOLIS_PSX_H

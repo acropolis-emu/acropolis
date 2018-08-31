@@ -16,3 +16,6 @@
  */
 
 #include "cpu.h"
+R3000A::R3000A(PSXMemory *memory) {
+  this->memory = memory;
+}

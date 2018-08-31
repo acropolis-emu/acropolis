@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <utility>
 
 class Registers {
 private:
@@ -69,13 +70,22 @@ public:
     }
   }
 
+  /*
+   * Sign extend a 16 bit value register to 32 bits
+   */
+  constexpr void sign_extend_16(size_t index) noexcept {
+    if (index > 0 && regs[index] & 0x8000) {
+      regs[index] |= 0xFFFF0000;
+    }
+  }
+
   /* Registers */
   uint32_t hi = 0;                // multiplication registers
   uint32_t lo = 0;
   uint32_t pc = 0;                // programme counter
 
   /* aliases */
-  const uint32_t &zr = 0;
+  const uint32_t zr = 0;
   uint32_t &at = regs[1];         // reserved for the compiler
 
   uint32_t &v0 = regs[2];         // values

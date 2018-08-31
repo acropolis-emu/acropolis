@@ -18,6 +18,18 @@
 #ifndef ACROPOLIS_NECV60_H
 #define ACROPOLIS_NECV60_H
 
-class NECV60 {};
+#include "registers.h"
+#include "../memory.h"
+
+class R3000A {
+private:
+  Registers registers;
+  std::shared_ptr<PSXMemory> memory;
+public:
+  R3000A(const R3000A&) = delete;
+  R3000A& operator=(const R3000A&) = delete;
+  explicit R3000A(PSXMemory *memory);
+
+};
 
 #endif // ACROPOLIS_NECV60_H

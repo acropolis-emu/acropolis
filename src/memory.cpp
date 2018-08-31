@@ -15,23 +15,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <r3000a/registers.h>
+#include "memory.h"
 
-TEST(Registers, TestAlias) {
-  Registers registers{};
-
-  registers.gpset(1, 0x10);
-  EXPECT_EQ(registers.at, 0x10);
-
-  registers.at = 0x20;
-  EXPECT_EQ(registers.gpget(1), 0x20);
+uint8_t PSXMemory::load_byte(uint32_t address) {
+  return 0;
 }
+uint16_t PSXMemory::load_halfword(uint32_t address) {
+  return 0;
+}
+uint32_t PSXMemory::load_word(uint32_t address) {
+  return 0;
+}
+void PSXMemory::store_byte(uint32_t address, uint8_t data) {
 
-TEST(Registers, TestZeroRegister) {
-  Registers registers{};
-  registers.gpset(0, 0x10);
-  EXPECT_EQ(registers.zr, 0x00);
-  EXPECT_EQ(registers.gpget(0), 0x00);
+}
+void PSXMemory::store_halfword(uint32_t address, uint16_t data) {
+
+}
+void PSXMemory::store_word(uint32_t address, uint32_t data) {
+
+}
+void PSXMemory::load_bios(std::array<uint8_t, BIOS_SIZE> bios) {
+  this->bios = bios;
 }

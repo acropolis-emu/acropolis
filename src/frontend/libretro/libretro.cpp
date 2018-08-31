@@ -138,5 +138,7 @@ void retro_reset(void) {}
 // Test the user input and return the state of the joysticks and buttons
 void get_joystick_state(unsigned port, uint8_t &x, uint8_t &y, uint8_t &b1, uint8_t &b2, uint8_t &b3, uint8_t &b4) {}
 
-// Run a single frames with out Vectrex emulation.
-void retro_run(void) {}
+// Run a single frames with out PSX emulation.
+void retro_run(void) {
+
+}

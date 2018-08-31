@@ -15,4 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "registers.h"
+#include "psx.h"
+
+PSX::PSX() {
+  cpu = std::make_unique<R3000A>(memory);
+}
