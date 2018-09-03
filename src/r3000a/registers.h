@@ -26,6 +26,7 @@ class Registers {
 private:
 
   uint32_t regs[32]{0};
+  uint32_t next_pc = 0;           // next PC (see pc)
 
 public:
   Registers() = default;
@@ -46,7 +47,7 @@ public:
     if (reg == 0) {  // not sure if this is better or not
       return 0;
     } else {
-    return regs[reg];
+      return regs[reg];
     }
   }
 
@@ -77,6 +78,11 @@ public:
     if (index > 0 && regs[index] & 0x8000) {
       regs[index] |= 0xFFFF0000;
     }
+  }
+
+  constexpr void increment_pc(int32_t offset) {
+    pc = next_pc;       // update the PC to the next value
+    next_pc += offset;  // update the next PC value (could be modified later by the instruction)
   }
 
   /* Registers */

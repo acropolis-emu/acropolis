@@ -23,10 +23,13 @@
 #include "r3000a/cpu.h"
 
 class PSX {
-  PSXMemory memory;
-  std::unique_ptr<R3000A> cpu;
+private:
+  std::unique_ptr<PSXMemory> memory;
+  std::unique_ptr<R3000A<PSXMemory>> cpu;
 
+public:
   PSX();
+  void reset() {};
 };
 
 #endif //ACROPOLIS_PSX_H

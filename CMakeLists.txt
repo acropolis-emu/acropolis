@@ -36,7 +36,7 @@ include(CTest)
 
 set(SOURCE_FILES
         src/frontend/libretro/libretro.cpp
-        src/r3000a/cpu.cpp src/r3000a/cpu.h
+        src/r3000a/cpu.h
         src/memory.cpp src/memory.h src/psx.cpp src/psx.h)
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")

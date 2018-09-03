@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "libretro.h"
+#include "../../psx.h"
 
 // Callbacks
 static retro_log_printf_t log_cb;
@@ -30,6 +31,9 @@ static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
+
+std::unique_ptr<PSX> psx;
+
 
 unsigned retro_api_version(void) {
   return RETRO_API_VERSION;
@@ -113,6 +117,9 @@ void retro_init(void) {
   // the performance level is guide to frontend to give an idea of how intensive
   // this core is to run
   environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
+
+  // Create the PSX emulator object
+  psx = std::make_unique<PSX>();
 }
 
 /*
@@ -133,7 +140,9 @@ void retro_get_system_info(struct retro_system_info *info) {
  */
 void retro_get_system_av_info(struct retro_system_av_info *info) {}
 
-void retro_reset(void) {}
+void retro_reset(void) {
+  psx->reset();
+}
 
 // Test the user input and return the state of the joysticks and buttons
 void get_joystick_state(unsigned port, uint8_t &x, uint8_t &y, uint8_t &b1, uint8_t &b2, uint8_t &b3, uint8_t &b4) {}
