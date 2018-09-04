@@ -1,8 +1,5 @@
 language: c++
 
-notifications:
-  webhooks: ${DISCORD_WEBHOOK_URL}
-
 matrix:
   include:
     - compiler: gcc
@@ -28,3 +25,7 @@ after_success:
   - lcov --directory build --capture --output-file coverage.info
   - lcov --remove coverage.info '/usr/*' 'gtest/*' 'gmock/*' 'tests/*' --output-file coverage.info
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - ./travis-hook success $DISCORD_WEBHOOK_URL
+
+after_failure:
+  - ./travis-hook failure $DISCORD_WEBHOOK_URL
