@@ -19,6 +19,7 @@
 #define ACROPOLIS_PSX_H
 
 #include <cstdint>
+#include <memory>
 #include "memory.h"
 #include "r3000a/cpu.h"
 
