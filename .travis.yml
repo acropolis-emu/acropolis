@@ -1,5 +1,8 @@
 language: c++
 
+notifications:
+  webhooks: ${DISCORD_WEBHOOK_URL}
+
 matrix:
   include:
     - compiler: gcc
