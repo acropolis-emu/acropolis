@@ -29,9 +29,9 @@ public:
   MOCK_CONST_METHOD1(load_word, uint32_t(uint32_t address));
 };
 
-
+// ADDU Tests
 TEST(OpCodes, ADDU) {
-  MockPSXMemory memory;
+  MockPSXMemory memory{};
   R3000A<MockPSXMemory> cpu(&memory);
 
   constexpr uint32_t ADDU_r3_r1_r2 = 0x00221821;
@@ -46,6 +46,87 @@ TEST(OpCodes, ADDU) {
   EXPECT_EQ(instruction, ADDU_r3_r1_r2);
 
   cpu.dispatch(instruction);
+  EXPECT_EQ(cpu.registers.gpget(1), 0x100);
+  EXPECT_EQ(cpu.registers.gpget(2), 0x200);
+  EXPECT_EQ(cpu.registers.gpget(3), 0x300);
+}
+
+// ADD tests
+TEST(OpCodes, ADDOverflow) {
+  MockPSXMemory memory{};
+  R3000A<MockPSXMemory> cpu(&memory);
+
+  constexpr uint32_t ADD_r3_r1_r2 = 0x00221820;
+  EXPECT_CALL(memory, load_word(_))
+      .WillOnce(Return(ADD_r3_r1_r2));  // ADD r3, r1, r2
+
+  cpu.registers.gpset(1, 0x7fffffff);
+  cpu.registers.gpset(2, 0x10);
+  cpu.registers.gpset(3, 0);
+
+  auto instruction = cpu.fetch();
+  EXPECT_EQ(instruction, ADD_r3_r1_r2);
+  cpu.dispatch(instruction);
+
+  EXPECT_EQ(cpu.registers.gpget(3), 0);
+  EXPECT_EQ(cpu.registers.pc, 0x80000080);
+}
+
+TEST(OpCodes, ADDUnderflow) {
+  MockPSXMemory memory{};
+  R3000A<MockPSXMemory> cpu(&memory);
+
+  constexpr uint32_t ADD_r3_r1_r2 = 0x00221820;
+  EXPECT_CALL(memory, load_word(_))
+      .WillOnce(Return(ADD_r3_r1_r2));  // ADD r3, r1, r2
+
+  cpu.registers.gpset(1, 0x80000000);
+  cpu.registers.gpset(2, 0xfffffffd);
+  cpu.registers.gpset(3, 0);
+
+  auto instruction = cpu.fetch();
+  EXPECT_EQ(instruction, ADD_r3_r1_r2);
+  cpu.dispatch(instruction);
+
+  EXPECT_EQ(cpu.registers.gpget(3), 0);
+  EXPECT_EQ(cpu.registers.pc, 0x80000080);
+}
+
+TEST(OpCodes, ADDNegPos) {
+  MockPSXMemory memory{};
+  R3000A<MockPSXMemory> cpu(&memory);
+
+  constexpr uint32_t ADD_r3_r1_r2 = 0x00221820;
+  EXPECT_CALL(memory, load_word(_))
+      .WillOnce(Return(ADD_r3_r1_r2));  // ADD r3, r1, r2
+
+  cpu.registers.gpset(1, 0x80000000);
+  cpu.registers.gpset(2, 0x1);
+  cpu.registers.gpset(3, 0);
+
+  auto instruction = cpu.fetch();
+  EXPECT_EQ(instruction, ADD_r3_r1_r2);
+  cpu.dispatch(instruction);
+
+  EXPECT_EQ(cpu.registers.gpget(3), 0x80000001);
+}
+
+TEST(OpCodes, ADDPosPos) {
+  MockPSXMemory memory{};
+  R3000A<MockPSXMemory> cpu(&memory);
+
+  constexpr uint32_t ADD_r3_r1_r2 = 0x00221820;
+  EXPECT_CALL(memory, load_word(_))
+      .WillOnce(Return(ADD_r3_r1_r2));  // ADD r3, r1, r2
+
+  cpu.registers.gpset(1, 0x100);
+  cpu.registers.gpset(2, 0x200);
+  cpu.registers.gpset(3, 0);
+
+  auto instruction = cpu.fetch();
+  EXPECT_EQ(instruction, ADD_r3_r1_r2);
+  cpu.dispatch(instruction);
+
   EXPECT_EQ(cpu.registers.gpget(1), 0x100);
   EXPECT_EQ(cpu.registers.gpget(2), 0x200);
   EXPECT_EQ(cpu.registers.gpget(3), 0x300);
