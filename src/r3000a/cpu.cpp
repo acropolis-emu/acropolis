@@ -15,22 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACROPOLIS_PSX_H
-#define ACROPOLIS_PSX_H
+#include "cpu.h"
 
-#include <cstdint>
-#include <memory>
-#include "memory.h"
-#include "r3000a/cpu.h"
+void R3000A::powerOn() {
+  reset();
+}
 
-class PSX {
-private:
-  std::unique_ptr<PSXMemory> memory;
-  std::unique_ptr<R3000A> cpu;
+void R3000A::reset() {
+  registers.pc = 0;
+}
 
-public:
-  PSX();
-  void reset() {};
-};
+void R3000A::step() {
+  instruction = memory->load_word(registers.pc); // fetch
+  dispatch();
+}
 
-#endif //ACROPOLIS_PSX_H
+void R3000A::dispatch()  {
+  auto opcode = decode_opcode();
+  if (opcode == 0) { // SPECIAL (0 opcode)
+    (*this.*opcode_handlers_special[decode_func()])();
+  } else {
+    (*this.*opcode_handlers[opcode])();
+  }
+}
+
+void R3000A::exception(R3000A::ExceptionCause cause) {
+  registers.pc = interrupt_vector;
+}
+

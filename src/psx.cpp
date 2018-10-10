@@ -19,5 +19,5 @@
 
 PSX::PSX() {
   memory = std::make_unique<PSXMemory>();
-  cpu = std::make_unique<R3000A<PSXMemory>>(memory.get());
+  cpu = std::make_unique<R3000A>(memory.get());
 }

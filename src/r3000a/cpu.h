@@ -21,10 +21,9 @@
 #include "registers.h"
 #include "../memory.h"
 
-template <class M>
 class R3000A {
 private:
-  M *memory;
+  PSXMemory *memory;
   static constexpr uint32_t interrupt_vector = 0x80000080u;
   static constexpr uint32_t max_int_2s = 0x7fffffffu;
 
@@ -45,99 +44,155 @@ private:
     // reserved
   };
 
+  uint32_t instruction; // current instruction
+
+  constexpr bool overflow(uint32_t a, uint32_t b, uint32_t r) {
+    return (~(a ^ b) & (a ^ r) & 0x80000000u) > 0;
+  }
+
 public:
+  typedef void (R3000A:: *opcode_handler)();
+  static opcode_handler opcode_handlers[64];
+  static opcode_handler opcode_handlers_special[64];
+
   Registers registers;
 
   R3000A(const R3000A&) = delete;
   R3000A& operator=(const R3000A&) = delete;
-  explicit R3000A(M *memory) {
+  explicit R3000A(PSXMemory *memory) {
     this->memory = memory;
   }
 
+  void powerOn();
+  void reset();
+
   // execute the cpu
-  void step() {
-    auto instruction = fetch();
-    dispatch(instruction);
-  }
+  void step();
+  void dispatch();
+  void exception(ExceptionCause cause);
 
-  constexpr uint64_t dispatch(uint32_t instruction) {
-    switch (decode_opcode(instruction)) {
-    case 0: // SPECIAL (0 opcode)
-      return dispatch_alu_instruction(instruction);
-    default:
-      exception(RI);
-      break;
-    }
-    return 0;
-  }
+  // Opcodes
+  void op_res();  // asserts reserved instruction exception
+  void op_add();
+  void op_addi();
+  void op_addiu();
+  void op_addu();
+  void op_and();
+  void op_andi();
+  void op_beq();
+  void op_bgtz();
+  void op_blez();
+  void op_bne();
+  void op_break();
+  void op_bxx();
+  void op_cop0();
+  void op_cop1();
+  void op_cop2();
+  void op_cop3();
+  void op_div();
+  void op_divu();
+  void op_j();
+  void op_jal();
+  void op_jalr();
+  void op_jr();
+  void op_lb();
+  void op_lbu();
+  void op_lh();
+  void op_lhu();
+  void op_lui();
+  void op_lw();
+  void op_lwc0();
+  void op_lwc1();
+  void op_lwc2();
+  void op_lwc3();
+  void op_lwl();
+  void op_lwr();
+  void op_mfhi();
+  void op_mflo();
+  void op_mthi();
+  void op_mtlo();
+  void op_mult();
+  void op_multu();
+  void op_nor();
+  void op_or();
+  void op_ori();
+  void op_sb();
+  void op_sh();
+  void op_sll();
+  void op_sllv();
+  void op_slt();
+  void op_slti();
+  void op_sltiu();
+  void op_sltu();
+  void op_sra();
+  void op_srav();
+  void op_srl();
+  void op_srlv();
+  void op_sub();
+  void op_subu();
+  void op_sw();
+  void op_swc0();
+  void op_swc1();
+  void op_swc2();
+  void op_swc3();
+  void op_swl();
+  void op_swr();
+  void op_syscall();
+  void op_xor();
+  void op_xori();
 
-  void exception(ExceptionCause cause) {
-    registers.pc = interrupt_vector;
-  }
-
-  constexpr uint64_t dispatch_alu_instruction(uint32_t instruction) {
-    uint32_t temp32 = 0;
-    uint64_t temp64 = 0;
-    auto rs = decode_rtype_rs(instruction);
-    auto rt = decode_rtype_rt(instruction);
-    auto rd = decode_rtype_rd(instruction);
-    auto shamt = decode_rtype_shamt(instruction);
-    auto funct = decode_rtype_func(instruction);
-
-    switch (funct) {
-    case 0x20:  // ADD (can throw overflow exception)
-      temp32 = registers.gpget(rs) + registers.gpget(rt);
-
-      // positive + positive = negative, overflow
-      // negative + negative = positive, underflow
-      if ((!is_neg_2s(registers.gpget(rs)) and !is_neg_2s(registers.gpget(rt)) and is_neg_2s(temp32))
-          or (is_neg_2s(registers.gpget(rs)) and is_neg_2s(registers.gpget(rt)) and !is_neg_2s(temp32))) {
-        exception(OVF);
-      } else {
-        registers.gpset(rd, temp32);
-      }
-      break;
-    case 0x21:  // ADDU
-      registers.gpset(rd, registers.gpget(rs) + registers.gpget(rt));
-      break;
-    default:
-      // exception
-      break;
-    }
-    return 0;
-  }
-
-  constexpr uint32_t fetch() {
-    return memory->load_word(registers.pc);
-  }
-
-  constexpr uint32_t decode_opcode(uint32_t instruction) {
+  constexpr uint32_t decode_opcode() {
     return (instruction & 0xfc000000u) >> 26u;
   }
 
-  constexpr uint32_t decode_rtype_rt(uint32_t instruction) {
-    return (instruction & 0x1f0000u) >> 16u;
+  constexpr uint32_t get_rt() {
+    return registers.gpget(decode_rt());
   }
 
-  constexpr uint32_t decode_rtype_rs(uint32_t instruction) {
+  constexpr uint32_t get_rs() {
+    return registers.gpget(decode_rs());
+  }
+
+  constexpr uint32_t get_rd() {
+    return registers.gpget(decode_rd());
+  }
+
+  constexpr void set_rd(uint32_t value) {
+    registers.gpset(decode_rd(), value);
+  }
+
+  constexpr void set_rt(uint32_t value) {
+    registers.gpset(decode_rt(), value);
+  }
+
+  constexpr uint32_t decode_rs() {
     return (instruction & 0x3e00000u) >> 21u;
   }
 
-  constexpr uint32_t decode_rtype_rd(uint32_t instruction) {
+  constexpr uint32_t decode_rt() {
+    return (instruction & 0x1f0000u) >> 16u;
+  }
+
+  constexpr uint32_t decode_rd() {
     return (instruction & 0xf800u) >> 11u;
   }
 
-  constexpr uint32_t decode_rtype_shamt(uint32_t instruction) {
+  constexpr uint32_t decode_shamt() {
     return (instruction & 0x7c0u) >> 6u;
   }
 
-  constexpr uint32_t decode_rtype_func(uint32_t instruction) {
+  constexpr uint32_t decode_func() {
     return instruction & 0x3fu;
   }
 
-  constexpr bool is_neg_2s(uint32_t operand) {
-    return (operand > max_int_2s);
+  constexpr uint32_t decode_target() {
+    return instruction & 0x3ffffffu;
   }
+
+  constexpr uint32_t decode_immediate() {
+    return instruction & 0xffffu;
+  }
+
 
 };
 

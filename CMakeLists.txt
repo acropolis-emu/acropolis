@@ -36,12 +36,13 @@ include(CTest)
 
 set(SOURCE_FILES
         src/frontend/libretro/libretro.cpp
-        src/r3000a/cpu.h
-        src/memory.cpp src/memory.h src/psx.cpp src/psx.h)
+        src/r3000a/cpu.h src/r3000a/cpu.cpp src/r3000a/opcodes.cpp
+        src/memory.cpp src/memory.h
+        src/psx.cpp src/psx.h)
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/link.T")
 
-add_library(acropolis_libretro SHARED ${SOURCE_FILES} src/r3000a/registers.h)
+add_library(acropolis_libretro SHARED ${SOURCE_FILES} src/r3000a/registers.h src/r3000a/opcodes.cpp src/r3000a/cpu.cpp)
 set_target_properties(acropolis_libretro PROPERTIES PREFIX "")  # remove lib prefix from target
 
 configure_file(src/config.h.in ${CMAKE_BINARY_DIR}/generated/config.h)

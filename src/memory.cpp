@@ -20,21 +20,27 @@
 uint8_t PSXMemory::load_byte(uint32_t address) {
   return 0;
 }
+
 uint16_t PSXMemory::load_halfword(uint32_t address) {
   return 0;
 }
+
 uint32_t PSXMemory::load_word(uint32_t address) {
   return 0;
 }
+
 void PSXMemory::store_byte(uint32_t address, uint8_t data) {
 
 }
+
 void PSXMemory::store_halfword(uint32_t address, uint16_t data) {
 
 }
+
 void PSXMemory::store_word(uint32_t address, uint32_t data) {
 
 }
+
 void PSXMemory::load_bios(std::array<uint8_t, BIOS_SIZE> bios) {
   this->bios = bios;
 }
