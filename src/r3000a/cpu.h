@@ -61,6 +61,7 @@ public:
 
   // execute the cpu
   void step();
+  void fetch();
   void dispatch();
   void exception(ExceptionCause cause);
 
@@ -77,7 +78,7 @@ public:
   void op_blez();
   void op_bne();
   void op_break();
-  void op_bxx();
+  void op_branch();
   void op_cop0();
   void op_cop1();
   void op_cop2();
@@ -134,64 +135,64 @@ public:
   void op_xor();
   void op_xori();
 
-  constexpr bool overflow(uint32_t a, uint32_t b, uint32_t r) {
+  constexpr bool overflow(uint32_t a, uint32_t b, uint32_t r) noexcept {
     return (~(a ^ b) & (a ^ r) & 0x80000000u) > 0;
   }
 
-  constexpr uint32_t decode_opcode() {
+  constexpr uint32_t opcode() noexcept {
     return (instruction & 0xfc000000u) >> 26u;
   }
 
-  constexpr uint32_t decode_rs() {
+  constexpr uint32_t d_rs() noexcept {
     return (instruction & 0x3e00000u) >> 21u;
   }
 
-  constexpr uint32_t decode_rt() {
+  constexpr uint32_t d_rt() noexcept {
     return (instruction & 0x1f0000u) >> 16u;
   }
 
-  constexpr uint32_t decode_rd() {
+  constexpr uint32_t d_rd() noexcept {
     return (instruction & 0xf800u) >> 11u;
   }
 
-  constexpr uint32_t decode_shamt() {
+  constexpr uint32_t shamt() noexcept {
     return (instruction & 0x7c0u) >> 6u;
   }
 
-  constexpr uint32_t decode_func() {
+  constexpr uint32_t func() noexcept {
     return instruction & 0x3fu;
   }
 
-  constexpr uint32_t decode_target() {
+  constexpr uint32_t target() noexcept {
     return instruction & 0x3ffffffu;
   }
 
-  constexpr uint32_t decode_immediate() {
+  constexpr uint32_t immediate() noexcept {
     return instruction & 0xffffu;
   }
 
-  constexpr uint32_t rt() {
-    return registers.get(decode_rt());
+  constexpr uint32_t rt() noexcept {
+    return registers.get(d_rt());
   }
 
-  constexpr void rt(uint32_t v) {
-    registers.set(decode_rt(), v);
+  constexpr void rt(uint32_t v) noexcept {
+    registers.set(d_rt(), v);
   }
 
-  constexpr uint32_t rs() {
-    return registers.get(decode_rs());
+  constexpr uint32_t rs() noexcept {
+    return registers.get(d_rs());
   }
 
-  constexpr void rs(uint32_t v) {
-    registers.set(decode_rs(), v);
+  constexpr void rs(uint32_t v) noexcept {
+    registers.set(d_rs(), v);
   }
 
-  constexpr uint32_t rd() {
-    return registers.get(decode_rd());
+  constexpr uint32_t rd() noexcept {
+    return registers.get(d_rd());
   }
 
-  constexpr void rd(uint32_t v) {
-    registers.set(decode_rd(), v);
+  constexpr void rd(uint32_t v) noexcept {
+    registers.set(d_rd(), v);
   }
 
 

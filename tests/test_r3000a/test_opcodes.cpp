@@ -102,3 +102,19 @@ TEST(OpCodes, ADDPosPos) {
   EXPECT_EQ(cpu.registers.get(2), 0x200);
   EXPECT_EQ(cpu.registers.get(3), 0x300);
 }
+
+TEST(OpCodes, AND) {
+  PSXMemory memory{};
+  R3000A cpu(&memory);
+
+  cpu.instruction = 0x00221824;  // AND r3, r1, r2
+  cpu.registers.set(1, 0x303);
+  cpu.registers.set(2, 0x220);
+  cpu.registers.set(3, 0);
+
+  cpu.dispatch();
+
+  EXPECT_EQ(cpu.registers.get(1), 0x303);
+  EXPECT_EQ(cpu.registers.get(2), 0x220);
+  EXPECT_EQ(cpu.registers.get(3), 0x200);
+}

@@ -18,22 +18,22 @@
 #include "cpu.h"
 
 R3000A::opcode_handler R3000A::opcode_handlers[64] = {
-    /* 00 */ nullptr,          &R3000A::op_bxx,   &R3000A::op_j,    &R3000A::op_jal,
-    /* 04 */ &R3000A::op_beq,  &R3000A::op_bne,   &R3000A::op_blez, &R3000A::op_bgtz,
-    /* 08 */ &R3000A::op_addi, &R3000A::op_addiu, &R3000A::op_slti, &R3000A::op_sltiu,
-    /* 0c */ &R3000A::op_andi, &R3000A::op_ori,   &R3000A::op_xori, &R3000A::op_lui,
-    /* 10 */ &R3000A::op_cop0, &R3000A::op_cop1,  &R3000A::op_cop2, &R3000A::op_cop3,
-    /* 04 */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_res,  &R3000A::op_res,
-    /* 08 */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_res,  &R3000A::op_res,
-    /* 0c */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_res,  &R3000A::op_res,
-    /* 20 */ &R3000A::op_lb,   &R3000A::op_lh,    &R3000A::op_lwl,  &R3000A::op_lw,
-    /* 24 */ &R3000A::op_lbu,  &R3000A::op_lhu,   &R3000A::op_lwr,  &R3000A::op_res,
-    /* 28 */ &R3000A::op_sb,   &R3000A::op_sh,    &R3000A::op_swl,  &R3000A::op_sw,
-    /* 2c */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_swr,  &R3000A::op_res,
-    /* 30 */ &R3000A::op_lwc0, &R3000A::op_lwc1,  &R3000A::op_lwc2, &R3000A::op_lwc3,
-    /* 34 */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_res,  &R3000A::op_res,
-    /* 38 */ &R3000A::op_swc0, &R3000A::op_swc1,  &R3000A::op_swc2, &R3000A::op_swc3,
-    /* 3c */ &R3000A::op_res,  &R3000A::op_res,   &R3000A::op_res,  &R3000A::op_res
+    /* 00 */ nullptr,          &R3000A::op_branch,  &R3000A::op_j,    &R3000A::op_jal,
+    /* 04 */ &R3000A::op_beq,  &R3000A::op_bne,     &R3000A::op_blez, &R3000A::op_bgtz,
+    /* 08 */ &R3000A::op_addi, &R3000A::op_addiu,   &R3000A::op_slti, &R3000A::op_sltiu,
+    /* 0c */ &R3000A::op_andi, &R3000A::op_ori,     &R3000A::op_xori, &R3000A::op_lui,
+    /* 10 */ &R3000A::op_cop0, &R3000A::op_cop1,    &R3000A::op_cop2, &R3000A::op_cop3,
+    /* 04 */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_res,  &R3000A::op_res,
+    /* 08 */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_res,  &R3000A::op_res,
+    /* 0c */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_res,  &R3000A::op_res,
+    /* 20 */ &R3000A::op_lb,   &R3000A::op_lh,      &R3000A::op_lwl,  &R3000A::op_lw,
+    /* 24 */ &R3000A::op_lbu,  &R3000A::op_lhu,     &R3000A::op_lwr,  &R3000A::op_res,
+    /* 28 */ &R3000A::op_sb,   &R3000A::op_sh,      &R3000A::op_swl,  &R3000A::op_sw,
+    /* 2c */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_swr,  &R3000A::op_res,
+    /* 30 */ &R3000A::op_lwc0, &R3000A::op_lwc1,    &R3000A::op_lwc2, &R3000A::op_lwc3,
+    /* 34 */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_res,  &R3000A::op_res,
+    /* 38 */ &R3000A::op_swc0, &R3000A::op_swc1,    &R3000A::op_swc2, &R3000A::op_swc3,
+    /* 3c */ &R3000A::op_res,  &R3000A::op_res,     &R3000A::op_res,  &R3000A::op_res
 
 };
 
@@ -61,6 +61,7 @@ void R3000A::op_res() {
   exception(R3000A::RI);
 }
 
+// ADD - rd = rs + rt; can raise exception
 void R3000A::op_add() {
   auto a = rs();
   auto b = rt();
@@ -72,48 +73,77 @@ void R3000A::op_add() {
   }
 }
 
+// ADDI - rt = rs + imm; can raise exception
 void R3000A::op_addi() {
-
+  auto a = rs();
+  auto b = immediate();
+  auto r = a + b;
+  if (overflow(a, b, r)) {
+    exception(R3000A::OVF);
+  } else {
+    rt(r);
+  }
 }
 
+// ADDIU - rt = rs + imm
 void R3000A::op_addiu() {
-
+  rt(rs() + immediate());
 }
 
+// ADDU - rd = rs + rt
 void R3000A::op_addu() {
   rd(rs() + rt());
 }
 
+// AND - rd = rs & rt
 void R3000A::op_and() {
-
+ rd(rs() & rt());
 }
 
+// ADDI - rt = rs & imm
 void R3000A::op_andi() {
-
+  rt(rs() & immediate());
 }
 
+// BEQ - branch if rs == rt
 void R3000A::op_beq() {
-
+  if (rs() == rt()) {
+    registers.next_pc = registers.pc + (immediate() << 2u);
+  }
 }
 
+// BGTZ - branch if rs greater than 0
 void R3000A::op_bgtz() {
-
+  if (rs() > 0) {
+    registers.next_pc = registers.pc + (immediate() << 2u);
+  }
 }
 
+// BLEZ - branch if rs less than or equal to 0
 void R3000A::op_blez() {
-
+  if (int32_t(rs()) <= 0) {
+    registers.next_pc = registers.pc + (immediate() << 2u);
+  }
 }
 
+// BNE - branch if rs != rt
 void R3000A::op_bne() {
+  if (rs() != rt()) {
+    registers.next_pc = registers.pc + (immediate() << 2u);
+  }
+}
+
+// Various branch operations
+// BGEZ
+// BGEZAL
+// BLTZ
+// BLTZAL
+void R3000A::op_branch() {
 
 }
 
 void R3000A::op_break() {
-
-}
-
-void R3000A::op_bxx() {
-
+  exception(R3000A::BP);
 }
 
 void R3000A::op_cop0() {

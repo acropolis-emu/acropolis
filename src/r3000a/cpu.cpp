@@ -26,20 +26,29 @@ void R3000A::reset() {
 }
 
 void R3000A::step() {
-  instruction = memory->load_word(registers.pc); // fetch
+  fetch();
   dispatch();
 }
 
 void R3000A::dispatch()  {
-  auto opcode = decode_opcode();
-  if (opcode == 0) { // SPECIAL (0 opcode)
-    (*this.*opcode_handlers_special[decode_func()])();
+  auto op = opcode();
+  if (op == 0) { // SPECIAL (0 opcode)
+    (*this.*opcode_handlers_special[func()])();
   } else {
-    (*this.*opcode_handlers[opcode])();
+    (*this.*opcode_handlers[op])();
   }
 }
 
 void R3000A::exception(R3000A::ExceptionCause cause) {
   registers.pc = interrupt_vector;
+}
+void R3000A::fetch() {
+  if (registers.pc & 0x03u) {
+    return exception(R3000A::ADEL); // instruction reads must be word aligned.
+  }
+  registers.pc = registers.next_pc;
+  registers.next_pc += 4;
+
+  instruction = memory->load_word(registers.pc); // fetch
 }
 
