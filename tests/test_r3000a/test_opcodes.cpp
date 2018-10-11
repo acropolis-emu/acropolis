@@ -118,3 +118,17 @@ TEST(OpCodes, AND) {
   EXPECT_EQ(cpu.registers.get(2), 0x220);
   EXPECT_EQ(cpu.registers.get(3), 0x200);
 }
+
+TEST(OpCodes, ANDI) {
+  PSXMemory memory{};
+  R3000A cpu(&memory);
+
+  cpu.instruction = 0x30220f0f;  // AND r2, r1, 0x0f0f
+  cpu.registers.set(1, 0xffff);
+  cpu.registers.set(2, 0);
+
+  cpu.dispatch();
+
+  EXPECT_EQ(cpu.registers.get(1), 0xffff);
+  EXPECT_EQ(cpu.registers.get(2), 0x0f0f);
+}
