@@ -22,10 +22,10 @@
 #include "../memory.h"
 
 class R3000A {
-private:
-  PSXMemory *memory;
+public:
+  typedef void (R3000A:: *opcode_handler)();
+
   static constexpr uint32_t interrupt_vector = 0x80000080u;
-  static constexpr uint32_t max_int_2s = 0x7fffffffu;
 
   enum ExceptionCause {
     INT,  // External interrupt
@@ -44,18 +44,11 @@ private:
     // reserved
   };
 
-  uint32_t instruction; // current instruction
-
-  constexpr bool overflow(uint32_t a, uint32_t b, uint32_t r) {
-    return (~(a ^ b) & (a ^ r) & 0x80000000u) > 0;
-  }
-
-public:
-  typedef void (R3000A:: *opcode_handler)();
+  PSXMemory *memory;
   static opcode_handler opcode_handlers[64];
   static opcode_handler opcode_handlers_special[64];
-
   Registers registers;
+  uint32_t instruction; // current instruction
 
   R3000A(const R3000A&) = delete;
   R3000A& operator=(const R3000A&) = delete;
@@ -141,28 +134,12 @@ public:
   void op_xor();
   void op_xori();
 
+  constexpr bool overflow(uint32_t a, uint32_t b, uint32_t r) {
+    return (~(a ^ b) & (a ^ r) & 0x80000000u) > 0;
+  }
+
   constexpr uint32_t decode_opcode() {
     return (instruction & 0xfc000000u) >> 26u;
-  }
-
-  constexpr uint32_t get_rt() {
-    return registers.gpget(decode_rt());
-  }
-
-  constexpr uint32_t get_rs() {
-    return registers.gpget(decode_rs());
-  }
-
-  constexpr uint32_t get_rd() {
-    return registers.gpget(decode_rd());
-  }
-
-  constexpr void set_rd(uint32_t value) {
-    registers.gpset(decode_rd(), value);
-  }
-
-  constexpr void set_rt(uint32_t value) {
-    registers.gpset(decode_rt(), value);
   }
 
   constexpr uint32_t decode_rs() {
@@ -191,6 +168,30 @@ public:
 
   constexpr uint32_t decode_immediate() {
     return instruction & 0xffffu;
+  }
+
+  constexpr uint32_t rt() {
+    return registers.get(decode_rt());
+  }
+
+  constexpr void rt(uint32_t v) {
+    registers.set(decode_rt(), v);
+  }
+
+  constexpr uint32_t rs() {
+    return registers.get(decode_rs());
+  }
+
+  constexpr void rs(uint32_t v) {
+    registers.set(decode_rs(), v);
+  }
+
+  constexpr uint32_t rd() {
+    return registers.get(decode_rd());
+  }
+
+  constexpr void rd(uint32_t v) {
+    registers.set(decode_rd(), v);
   }
 
 

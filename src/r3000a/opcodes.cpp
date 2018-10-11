@@ -62,13 +62,13 @@ void R3000A::op_res() {
 }
 
 void R3000A::op_add() {
-  auto a = get_rs();
-  auto b = get_rt();
+  auto a = rs();
+  auto b = rt();
   auto r = a + b;
   if (overflow(a, b, r)) {
     exception(R3000A::OVF);
   } else {
-    set_rd(r);
+    rd(r);
   }
 }
 
@@ -81,9 +81,7 @@ void R3000A::op_addiu() {
 }
 
 void R3000A::op_addu() {
-  auto r = get_rs() + get_rt();
-  printf("ADDU: %d + %d = %d\n", get_rs(), get_rt(), r);
-  set_rd(r);
+  rd(rs() + rt());
 }
 
 void R3000A::op_and() {

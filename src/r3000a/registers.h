@@ -24,7 +24,6 @@
 
 class Registers {
 private:
-
   uint32_t regs[32]{0};
   uint32_t next_pc = 0;           // next PC (see pc)
 
@@ -32,29 +31,22 @@ public:
   Registers() = default;
 
   /*
-   * Set the value of a general purpose register, r0 is never updated
+   * Get a reference for a general purpose register
    */
-  constexpr void gpset(size_t reg, uint32_t value) noexcept {
-    if (reg > 0) {
-      regs[reg] = value;
-    }
+  constexpr uint32_t get(size_t reg) noexcept {
+    return regs[reg];
   }
 
-  /*
-   * Get the value for a general purpose register, r0 is always 0
-   */
-  constexpr uint32_t gpget(size_t reg) noexcept {
-    if (reg == 0) {  // not sure if this is better or not
-      return 0;
-    } else {
-      return regs[reg];
+  constexpr void set(size_t reg, uint32_t v) noexcept {
+    if (reg > 0) {
+      regs[reg] = v;
     }
   }
 
   /*
    * Copies the value of src register to the destination register (src -> dst)
    */
-  constexpr void gpcopy(size_t src, size_t dst) noexcept {
+  constexpr void copy(size_t src, size_t dst) noexcept {
     if (dst > 0) {  // do nothing on copy to r0
       regs[dst] = regs[src];
     }
@@ -63,11 +55,11 @@ public:
   /*
    * Swap two general purpose registers (src <-> dst)
    */
-  constexpr void gpswap(size_t src, size_t dst) noexcept {
+  constexpr void swap(size_t src, size_t dst) noexcept {
     if (dst > 0) {  // swap if the destination is not r0
       std::swap(regs[src], regs[dst]);
     } else { // if the dst is r0 then just copy 0 to the rs
-      gpcopy(src, 0);
+      copy(src, 0);
     }
   }
 

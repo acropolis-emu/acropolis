@@ -22,16 +22,16 @@
 TEST(Registers, TestAlias) {
   Registers registers{};
 
-  registers.gpset(1, 0x10);
+  registers.set(1, 0x10);
   EXPECT_EQ(registers.at, 0x10);
 
   registers.at = 0x20;
-  EXPECT_EQ(registers.gpget(1), 0x20);
+  EXPECT_EQ(registers.get(1), 0x20);
 }
 
 TEST(Registers, TestZeroRegister) {
   Registers registers{};
-  registers.gpset(0, 0x10);
+  registers.set(0, 0x10);
   EXPECT_EQ(registers.zr, 0x00);
-  EXPECT_EQ(registers.gpget(0), 0x00);
+  EXPECT_EQ(registers.get(0), 0x00);
 }
